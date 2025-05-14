@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/01 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/05/06 17:14:11 by shutan           ###   ########.fr       */
+/*   Updated: 2025/05/13 16:39:50 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,13 +63,17 @@ static int	handle_redirect(t_token **token, t_cmd *cmd)
 {
 	int			type;
 	t_token		*file_token;
+	t_redirect	*redir_node;
 
 	type = (*token)->type;
 	*token = (*token)->next;
 	if (!*token || (*token)->type != T_WORD)
 		return (0);
 	file_token = *token;
-	add_redirect(cmd, new_redirect(type, file_token->value));
+	redir_node = new_redirect(type, file_token->value);
+	if (!redir_node)
+		return (0);
+	add_redirect(cmd, redir_node);
 	*token = (*token)->next;
 	return (1);
 }
@@ -118,36 +122,46 @@ static int	add_arg(t_cmd *cmd, char *arg)
 /* 解析命令和参数 */
 static t_cmd	*parse_cmd(t_token **token)
 {
-	t_cmd	*cmd;
-	t_cmd	*current;
+	t_cmd	*head_cmd;
+	t_cmd	*current_cmd;
 
-	cmd = new_cmd();
-	if (!cmd)
+	head_cmd = new_cmd();
+	if (!head_cmd)
 		return (NULL);
-	current = cmd;
+	current_cmd = head_cmd;
 	while (*token)
 	{
 		if ((*token)->type == T_WORD)
 		{
-			if (!add_arg(current, (*token)->value))
+			if (!add_arg(current_cmd, (*token)->value))
+			{
+				free_cmds(head_cmd);
 				return (NULL);
+			}
 			*token = (*token)->next;
 		}
 		else if ((*token)->type == T_PIPE)
 		{
-			current = handle_pipe(token, current);
-			if (!current)
+			t_cmd *next_cmd = handle_pipe(token, current_cmd);
+			if (!next_cmd)
+			{
+				free_cmds(head_cmd);
 				return (NULL);
+			}
+			current_cmd = next_cmd;
 		}
 		else if ((*token)->type >= T_REDIR_IN && (*token)->type <= T_HEREDOC)
 		{
-			if (!handle_redirect(token, current))
+			if (!handle_redirect(token, current_cmd))
+			{
+				free_cmds(head_cmd);
 				return (NULL);
+			}
 		}
 		else
 			*token = (*token)->next;
 	}
-	return (cmd);
+	return (head_cmd);
 }
 
 /* 释放命令结构 */

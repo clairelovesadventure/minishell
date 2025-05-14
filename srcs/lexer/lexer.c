@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/01 00:00:00 by user              #+#    #+#             */
-/*   Updated: 2025/05/13 16:00:57 by marrey           ###   ########.fr       */
+/*   Updated: 2025/05/13 16:46:13 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ static t_token	*new_token(char *value, t_token_type type)
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)
+	{
+		free(value);
 		return (NULL);
+	}
 	token->value = value;
 	token->type = type;
 	token->next = NULL;
@@ -68,11 +71,20 @@ static int	handle_quotes(char *input, int *i, char **word)
 */
 
 /* 处理特殊字符 */
+// Returns 1 on success (token added), 0 on error (malloc failure),
+// -1 if input[*i] is not a special char handled by this function.
 static int	handle_special_char(char *input, int *i, t_token **tokens)
 {
+	char *value_str;
+	t_token *new_tok;
+
 	if (input[*i] == '|')
 	{
-		add_token(tokens, new_token(ft_strdup("|"), T_PIPE));
+		value_str = ft_strdup("|");
+		if (!value_str) return (0);
+		new_tok = new_token(value_str, T_PIPE);
+		if (!new_tok) return (0); // new_token frees value_str on failure
+		add_token(tokens, new_tok);
 		(*i)++;
 		return (1);
 	}
@@ -80,12 +92,20 @@ static int	handle_special_char(char *input, int *i, t_token **tokens)
 	{
 		if (input[*i + 1] == '<')
 		{
-			add_token(tokens, new_token(ft_strdup("<<"), T_HEREDOC));
+			value_str = ft_strdup("<<");
+			if (!value_str) return (0);
+			new_tok = new_token(value_str, T_HEREDOC);
+			if (!new_tok) return (0);
+			add_token(tokens, new_tok);
 			(*i) += 2;
 		}
 		else
 		{
-			add_token(tokens, new_token(ft_strdup("<"), T_REDIR_IN));
+			value_str = ft_strdup("<");
+			if (!value_str) return (0);
+			new_tok = new_token(value_str, T_REDIR_IN);
+			if (!new_tok) return (0);
+			add_token(tokens, new_tok);
 			(*i)++;
 		}
 		return (1);
@@ -94,34 +114,45 @@ static int	handle_special_char(char *input, int *i, t_token **tokens)
 	{
 		if (input[*i + 1] == '>')
 		{
-			add_token(tokens, new_token(ft_strdup(">>"), T_REDIR_APPEND));
+			value_str = ft_strdup(">>");
+			if (!value_str) return (0);
+			new_tok = new_token(value_str, T_REDIR_APPEND);
+			if (!new_tok) return (0);
+			add_token(tokens, new_tok);
 			(*i) += 2;
 		}
 		else
 		{
-			add_token(tokens, new_token(ft_strdup(">"), T_REDIR_OUT));
+			value_str = ft_strdup(">");
+			if (!value_str) return (0);
+			new_tok = new_token(value_str, T_REDIR_OUT);
+			if (!new_tok) return (0);
+			add_token(tokens, new_tok);
 			(*i)++;
 		}
 		return (1);
 	}
-	return (0);
+	return (-1); // Not a special char for this function
 }
 
 /* 处理单词或引用 */
-static void	handle_word(char *input, int *i, t_token **tokens)
+// Returns 1 on success (token added or word was empty after processing),
+// 0 on error (malloc failure).
+static int	handle_word(char *input, int *i, t_token **tokens)
 {
 	char	*final_word_value;
 	char	*segment;
 	int		segment_start_index;
 	char	quote_char;
+	t_token *new_tok; // For checking new_token result
 
 	final_word_value = ft_strdup("");
 	if (!final_word_value)
-		return; /* Malloc error */
+		return (0); /* Malloc error */
 	while (input[*i] && input[*i] != ' ' && input[*i] != '\t' && \
 			input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
 	{
-		char *temp;
+		char *temp_join_result; // Renamed from temp to avoid conflict if used elsewhere
 		segment_start_index = *i;
 		segment = NULL;
 		if (input[*i] == '\'' || input[*i] == '\"')
@@ -144,22 +175,29 @@ static void	handle_word(char *input, int *i, t_token **tokens)
 		}
 		if (segment)
 		{
-			temp = final_word_value;
-			final_word_value = ft_strjoin(temp, segment);
-			free(temp);
+			temp_join_result = final_word_value;
+			final_word_value = ft_strjoin(temp_join_result, segment);
+			free(temp_join_result);
 			free(segment);
 			if (!final_word_value)
-				return; /* Malloc error */
+				return (0); /* Malloc error from ft_strjoin */
 		}
-		else /* ft_substr likely failed or segment was empty */
+		else /* ft_substr likely failed */
 		{
-			break;
+			free(final_word_value); // Free partially built word if substr failed
+			return (0); // Indicate malloc error from ft_substr
 		}
 	}
 	if (ft_strlen(final_word_value) > 0)
-		add_token(tokens, new_token(final_word_value, T_WORD));
+	{
+		new_tok = new_token(final_word_value, T_WORD);
+		if (!new_tok) // new_token already freed final_word_value if it failed
+			return (0); // Malloc error for token struct
+		add_token(tokens, new_tok);
+	}
 	else
-		free(final_word_value);
+		free(final_word_value); // Free if empty and no token created
+	return (1); // Success
 }
 
 /* 词法分析主函数 */
@@ -167,22 +205,35 @@ t_token	*lexer(char *input)
 {
 	int		i;
 	t_token	*tokens;
+	int		status;
 
 	i = 0;
 	tokens = NULL;
 	while (input[i])
 	{
 		if (input[i] == ' ' || input[i] == '\t')
+		{
 			i++;
-		/* Check for special operator tokens first */
-		else if (input[i] == '|' || input[i] == '<' || input[i] == '>')
-		{
-			handle_special_char(input, &i, &tokens); /* This advances i */
+			continue;
 		}
-		else /* Must be a word or start of a quoted segment */
+		status = handle_special_char(input, &i, &tokens);
+		if (status == 0) // Malloc error in handle_special_char
 		{
-			handle_word(input, &i, &tokens); /* This should advance i */
+			free_tokens(tokens);
+			return (NULL);
 		}
+		if (status == 1) // Special char handled successfully
+			continue;
+		// If status == -1, it was not a special char, so try handle_word
+		
+		status = handle_word(input, &i, &tokens);
+		if (status == 0) // Malloc error in handle_word
+		{
+			free_tokens(tokens);
+			return (NULL);
+		}
+		// If handle_word returns 1, it succeeded (token may or may not have been added if word was empty)
+		// The loop continues as i has been advanced by handle_word.
 	}
 	return (tokens);
 }
