@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 21:45:30 by marrey            #+#    #+#             */
-/*   Updated: 2025/05/24 12:31:41 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/18 21:18:51 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,11 @@ static int	expand_redirects(t_cmd *cmd, t_shell *shell)
 	{
 		expanded = perform_single_expansion(current->file, shell);
 		if (!expanded)
-			return (-1);
+		{
+			// Empty expansion is not an error for redirects, just skip
+			current = current->next;
+			continue;
+		}
 		if (expanded[0] == NULL || expanded[1] != NULL
 			|| *expanded[0] == '\0')
 		{
@@ -44,8 +48,14 @@ static int	expand_redirects(t_cmd *cmd, t_shell *shell)
 static char	**allocate_new_args(int arg_count)
 {
 	char	**new_args;
+	int		i;
 
 	new_args = malloc(sizeof(char *) * (arg_count + 1));
+	if (!new_args)
+		return (NULL);
+	// Initialize all pointers to NULL
+	for (i = 0; i <= arg_count; i++)
+		new_args[i] = NULL;
 	return (new_args);
 }
 
@@ -84,7 +94,10 @@ static int	expand_args(t_cmd *cmd, t_shell *shell)
 	if (!new_args)
 		return (-1);
 	if (process_args_loop(cmd, new_args, shell) == -1)
+	{
+		free(new_args); // Free the allocated memory if process_args_loop fails
 		return (-1);
+	}
 	free(cmd->args);
 	cmd->args = new_args;
 	return (0);
@@ -97,6 +110,15 @@ int	expand_command(t_cmd *cmd, t_shell *shell)
 	if (expand_args(cmd, shell) != 0)
 		return (-1);
 	if (expand_redirects(cmd, shell) != 0)
+	{
+		// If expand_redirects fails, we need to free the expanded args
+		// since the command will not be executed
+		if (cmd->args)
+		{
+			free_str_array(cmd->args);
+			cmd->args = NULL;
+		}
 		return (-1);
+	}
 	return (0);
 }

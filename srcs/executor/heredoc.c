@@ -6,46 +6,14 @@
 /*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 14:30:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 16:05:20 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/18 17:18:16 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-static volatile pid_t	g_readline_pid = 0;
-static volatile int		g_heredoc_interrupted = 0;
-
-static void	heredoc_sigint_handler(int sig)
-{
-	(void)sig;
-	g_heredoc_interrupted = 1;
-	if (g_readline_pid > 0)
-	{
-		kill(g_readline_pid, SIGINT);
-		g_readline_pid = 0;
-	}
-	write(STDOUT_FILENO, "\n", 1);
-}
-
-static int	setup_heredoc_signals(void)
-{
-	struct sigaction	sa;
-
-	sa.sa_handler = heredoc_sigint_handler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	if (sigaction(SIGINT, &sa, NULL) == -1)
-		return (-1);
-	signal(SIGQUIT, SIG_IGN);
-	return (0);
-}
-
-static void	restore_heredoc_signals(void)
-{
-	setup_signals();
-	if (g_heredoc_interrupted)
-		setup_readline();
-}
+volatile pid_t	g_readline_pid = 0;
+volatile int		g_heredoc_interrupted = 0;
 
 static int	child_readline_process(int pipe_fd[2])
 {
@@ -67,6 +35,12 @@ static int	child_readline_process(int pipe_fd[2])
 	exit(0);
 }
 
+static char	*handle_heredoc_fork_error(int pipe_fd[2])
+{
+	cleanup_pipe(pipe_fd);
+	return (NULL);
+}
+
 static char	*read_heredoc_line(void)
 {
 	int		pipe_fd[2];
@@ -81,11 +55,7 @@ static char	*read_heredoc_line(void)
 		return (NULL);
 	pid = fork();
 	if (pid == -1)
-	{
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-		return (NULL);
-	}
+		return (handle_heredoc_fork_error(pipe_fd));
 	if (pid == 0)
 		child_readline_process(pipe_fd);
 	g_readline_pid = pid;
@@ -102,10 +72,7 @@ static char	*read_heredoc_line(void)
 	if (bytes_read <= 0)
 		return (NULL);
 	buffer[bytes_read] = '\0';
-	while (bytes_read > 0 && (buffer[bytes_read - 1] == '\n'
-			|| buffer[bytes_read - 1] == '\r'))
-		buffer[--bytes_read] = '\0';
-	return (ft_strdup(buffer));
+	return (process_heredoc_buffer(buffer, bytes_read));
 }
 
 int	handle_heredoc(char *delimiter)
@@ -127,22 +94,12 @@ int	handle_heredoc(char *delimiter)
 		line = read_heredoc_line();
 		if (!line)
 			break ;
-		if (ft_strcmp(line, delimiter) == 0)
-		{
-			free(line);
+		if (process_heredoc_line(pipe_fd, line, delimiter))
 			break ;
-		}
-		write(pipe_fd[1], line, ft_strlen(line));
-		write(pipe_fd[1], "\n", 1);
-		free(line);
 	}
 	restore_heredoc_signals();
 	close(pipe_fd[1]);
 	if (g_heredoc_interrupted)
-	{
-		close(pipe_fd[0]);
-		g_signal_status = 130;
-		return (-1);
-	}
+		return (handle_heredoc_interruption(pipe_fd));
 	return (pipe_fd[0]);
 }

@@ -6,14 +6,14 @@
 #    By: shutan <shutan@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/01 00:00:00 by user              #+#    #+#              #
-#    Updated: 2025/07/18 16:14:15 by shutan           ###   ########.fr        #
+#    Updated: 2025/07/18 21:43:55 by shutan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -f
 
 # 包含libft库
@@ -30,6 +30,8 @@ SRCS_PATH = ./srcs
 SRCS = $(SRCS_PATH)/main.c \
        $(SRCS_PATH)/main/main_utils.c \
        $(SRCS_PATH)/main/input_handler.c \
+       $(SRCS_PATH)/main/input_processing.c \
+       $(SRCS_PATH)/main/input_utils.c \
        $(SRCS_PATH)/main/terminal_utils.c \
        $(SRCS_PATH)/main/command_processor.c \
        $(SRCS_PATH)/lexer/lexer.c \
@@ -50,6 +52,9 @@ SRCS = $(SRCS_PATH)/main.c \
        $(SRCS_PATH)/executor/executor.c \
        $(SRCS_PATH)/executor/executor_utils.c \
        $(SRCS_PATH)/executor/heredoc.c \
+       $(SRCS_PATH)/executor/heredoc_signals.c \
+       $(SRCS_PATH)/executor/heredoc_utils.c \
+       $(SRCS_PATH)/executor/heredoc_preprocess.c \
        $(SRCS_PATH)/executor/filename_utils.c \
        $(SRCS_PATH)/executor/builtin_handler.c \
        $(SRCS_PATH)/executor/pipe_handler.c \

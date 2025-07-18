@@ -6,7 +6,7 @@
 /*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:21 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 16:07:23 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/18 22:07:37 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,80 +14,28 @@
 
 int	g_signal_status = 0;
 
-static void	handle_input_loop(t_shell *shell)
+void	cleanup_before_exit(t_shell *shell)
 {
-	char	*current_input;
-	char	buffer[4096];
-	ssize_t	bytes_read;
-	char	*input_copy;
-	char	*line;
-	char	*newline_pos;
-	char	*exit_str;
+	// Free shell memory first (including environment variables)
+	free_shell(shell);
 
-	if (!isatty(STDIN_FILENO))
+	// Clear readline history and buffers to free memory
+	cleanup_readline_completely();
+
+	// Reset signal handlers to default
+	reset_signals();
+
+	// Restore terminal state
+	restore_terminal_state();
+
+	// Force flush of any remaining output
+	fflush(stdout);
+	fflush(stderr);
+
+	// Close any remaining file descriptors (except stdin, stdout, stderr)
+	for (int fd = 3; fd < 1024; fd++)
 	{
-		bytes_read = read(STDIN_FILENO, buffer, sizeof(buffer) - 1);
-		if (bytes_read > 0)
-		{
-			buffer[bytes_read] = '\0';
-			input_copy = ft_strdup(buffer);
-			if (!input_copy)
-				return ;
-			line = input_copy;
-			while (line && *line)
-			{
-				newline_pos = ft_strchr(line, '\n');
-				if (newline_pos)
-				{
-					*newline_pos = '\0';
-					newline_pos++;
-				}
-				if (ft_strlen(line) > 0)
-				{
-					shell->input = ft_strdup(line);
-					if (shell->input)
-					{
-						process_input(shell);
-						clean_current_command(shell);
-					}
-				}
-				if (!newline_pos)
-					break ;
-				line = newline_pos;
-			}
-			free(input_copy);
-		}
-		return ;
-	}
-	while (1)
-	{
-		current_input = read_input();
-		if (g_signal_status == 130)
-		{
-			shell->exit_status = 130;
-			exit_str = ft_itoa(130);
-			if (exit_str)
-			{
-				set_env_value(&(shell->env_list), "?", exit_str);
-				free(exit_str);
-			}
-			g_signal_status = 0;
-		}
-		if (!current_input)
-			break ;
-		if (current_input[0] != '\0')
-		{
-			shell->input = ft_strdup(current_input);
-			free(current_input);
-			if (shell->input)
-			{
-				add_history(shell->input);
-				process_input(shell);
-				clean_current_command(shell);
-			}
-		}
-		else
-			free(current_input);
+		close(fd);
 	}
 }
 
@@ -105,7 +53,8 @@ int	main(int argc, char **argv, char **envp)
 	setup_readline();
 	handle_input_loop(shell);
 	last_status = shell->exit_status;
-	restore_terminal_state();
-	free_shell(shell);
+	// Final cleanup to ensure all command data is freed
+	clean_current_command(shell);
+	cleanup_before_exit(shell);
 	return (last_status);
 }

@@ -6,7 +6,7 @@
 /*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 16:05:14 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/18 22:10:09 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,21 @@ int	is_single_parent_builtin(t_cmd *cmd_list, int num_cmds)
 {
 	return (num_cmds == 1 && cmd_list->args && cmd_list->args[0]
 		&& is_parent_builtin(cmd_list->args[0]));
+}
+
+static void	restore_file_descriptors(int stdin_backup, int stdout_backup)
+{
+	dup2(stdin_backup, STDIN_FILENO);
+	dup2(stdout_backup, STDOUT_FILENO);
+	close(stdin_backup);
+	close(stdout_backup);
+}
+
+static void	handle_exit_command(int exit_status, t_shell *shell)
+{
+		clean_current_command(shell);
+		cleanup_before_exit(shell);
+		exit(exit_status);
 }
 
 static int	execute_single_builtin(t_cmd *cmd, t_env **env_list, t_shell *shell)
@@ -33,21 +48,13 @@ static int	execute_single_builtin(t_cmd *cmd, t_env **env_list, t_shell *shell)
 	else if (!cmd->args || !cmd->args[0])
 		exit_status = 0;
 	else
-	{
 		exit_status = exec_builtin(cmd, env_list, shell);
-		if (cmd->args[0] && ft_strcmp(cmd->args[0], "exit") == 0)
-		{
-			dup2(stdin_backup, STDIN_FILENO);
-			dup2(stdout_backup, STDOUT_FILENO);
-			close(stdin_backup);
-			close(stdout_backup);
-			exit(exit_status);
-		}
+	if (cmd->args[0] && ft_strcmp(cmd->args[0], "exit") == 0)
+	{
+		restore_file_descriptors(stdin_backup, stdout_backup);
+		handle_exit_command(exit_status, shell);
 	}
-	dup2(stdin_backup, STDIN_FILENO);
-	dup2(stdout_backup, STDOUT_FILENO);
-	close(stdin_backup);
-	close(stdout_backup);
+	restore_file_descriptors(stdin_backup, stdout_backup);
 	return (exit_status);
 }
 

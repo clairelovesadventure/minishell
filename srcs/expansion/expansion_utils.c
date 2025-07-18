@@ -6,7 +6,7 @@
 /*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 23:52:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 16:05:14 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/18 21:15:35 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ char	**perform_single_expansion(char *token, t_shell *shell)
 	if (*quotes_removed_token == '\0')
 	{
 		free(quotes_removed_token);
-		return (create_empty_result());
+		return (NULL); // Return NULL instead of create_empty_result()
 	}
 	return (create_single_result(quotes_removed_token));
 }
@@ -61,7 +61,7 @@ int	process_single_arg(char **new_args, int *j, char *arg, t_shell *shell)
 
 	expanded = perform_single_expansion(arg, shell);
 	if (!expanded)
-		return (-1);
+		return (0); // Return 0 instead of -1 for empty expansion
 	if (expanded[0] != NULL)
 	{
 		new_args[*j] = expanded[0];

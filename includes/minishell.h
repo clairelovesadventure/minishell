@@ -6,7 +6,7 @@
 /*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 19:24:50 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 16:09:27 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/18 22:07:21 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@
 # include <termios.h>
 
 /* 信号处理的全局变量 */
-extern int	g_signal_status;
+extern int				g_signal_status;
+extern volatile pid_t	g_readline_pid;
+extern volatile int		g_heredoc_interrupted;
 
 /* 标记类型枚举 */
 typedef enum e_token_type
@@ -115,112 +117,143 @@ typedef struct s_expand_state
 /* 函数原型 */
 
 /* 词法分析器 */
-t_token	*lexer(char *input);
-void	free_tokens(t_token *tokens);
-t_token	*new_token(char *value, t_token_type type);
-void	add_token(t_token **tokens, t_token *new_token);
-int		handle_special_char(char *input, int *i, t_token **tokens);
-void	handle_word(char *input, int *i, t_token **tokens);
+t_token		*lexer(char *input);
+void		free_tokens(t_token *tokens);
+t_token		*new_token(char *value, t_token_type type);
+void		add_token(t_token **tokens, t_token *new_token);
+int			handle_special_char(char *input, int *i, t_token **tokens);
+void		handle_word(char *input, int *i, t_token **tokens);
 
 /* 语法分析器 */
-t_cmd	*parser(t_token *tokens);
-void	free_cmds(t_cmd *cmds);
-t_cmd	*new_cmd(void);
+t_cmd		*parser(t_token *tokens);
+void		free_cmds(t_cmd *cmds);
+t_cmd		*new_cmd(void);
 t_redirect	*new_redirect(int type, char *file);
-void	add_redirect(t_cmd *cmd, t_redirect *redirect);
-int		handle_redirect(t_token **token, t_cmd *cmd);
-int		add_arg(t_cmd *cmd, char *arg);
-t_cmd	*handle_pipe(t_token **token, t_cmd *cmd);
+void		add_redirect(t_cmd *cmd, t_redirect *redirect);
+int			handle_redirect(t_token **token, t_cmd *cmd);
+int			add_arg(t_cmd *cmd, char *arg);
+t_cmd		*handle_pipe(t_token **token, t_cmd *cmd);
 
 /* 执行器 */
-int		executor(t_cmd *cmd_list, t_env **env_list, t_shell *shell);
-char	*find_executable(char *cmd, t_env *env_list);
-void	free_array(char **array);
-int		handle_heredoc(char *delimiter);
-int		setup_redirections(t_redirect *redirects);
-int		is_parent_builtin(const char *cmd_name);
-int		is_single_parent_builtin(t_cmd *cmd_list, int num_cmds);
-int		execute_builtin_command(t_cmd *cmd_list, t_env **env_list,
-			t_shell *shell);
-int		handle_input_redirect(char *filename);
-int		handle_output_redirect(char *filename);
-int		handle_append_redirect(char *filename);
-int		handle_heredoc_redirect(char *delimiter);
+int			executor(t_cmd *cmd_list, t_env **env_list, t_shell *shell);
+char		*find_executable(char *cmd, t_env *env_list);
+void		free_array(char **array);
+int			handle_heredoc(char *delimiter);
+int			setup_redirections(t_redirect *redirects);
+int			is_parent_builtin(const char *cmd_name);
+int			is_single_parent_builtin(t_cmd *cmd_list, int num_cmds);
+int			execute_builtin_command(t_cmd *cmd_list, t_env **env_list,
+				t_shell *shell);
+int			handle_input_redirect(char *filename);
+int			handle_output_redirect(char *filename);
+int			handle_append_redirect(char *filename);
+int			handle_heredoc_redirect(char *delimiter);
+
+/* Heredoc preprocessing */
+int			preprocess_heredoc(t_redirect *redirect);
+void		cleanup_temp_files(t_cmd *cmd_list);
+int			preprocess_heredocs_in_cmd(t_cmd *cmd);
+int			preprocess_all_heredocs(t_cmd *cmd_list);
+
+/* Heredoc signals */
+void		heredoc_sigint_handler(int sig);
+int			setup_heredoc_signals(void);
+void		restore_heredoc_signals(void);
+
+/* Heredoc utilities */
+void		cleanup_pipe(int pipe_fd[2]);
+char		*process_heredoc_buffer(char *buffer, ssize_t bytes_read);
+int			process_heredoc_line(int pipe_fd[2], char *line, char *delimiter);
+int			handle_heredoc_interruption(int pipe_fd[2]);
 
 /* 内置命令 */
-int		ft_echo(char **args, t_env *env_list);
-int		ft_cd(char **args, t_env **env_list);
-int		ft_pwd(void);
-int		ft_export(char **args, t_env **env_list);
-int		ft_unset(char **args, t_env **env_list);
-int		ft_env(t_env *env_list);
-int		ft_exit(char **args, t_shell *shell);
+int			ft_echo(char **args, t_env *env_list);
+int			ft_cd(char **args, t_env **env_list);
+int			ft_pwd(void);
+int			ft_export(char **args, t_env **env_list);
+int			ft_unset(char **args, t_env **env_list);
+int			ft_env(t_env *env_list);
+int			ft_exit(char **args, t_shell *shell);
 
 /* 环境变量 */
-t_env	*init_env(char **envp);
-char	*get_env_value(t_env *env_list, const char *key);
-void	set_env_value(t_env **env_list, char *key, char *value);
-void	free_env(t_env *env_list);
-char	**env_to_array(t_env *env_list);
-void	add_or_update_env(t_env **env_list, const char *arg);
+t_env		*init_env(char **envp);
+char		*get_env_value(t_env *env_list, const char *key);
+void		set_env_value(t_env **env_list, char *key, char *value);
+void		free_env(t_env *env_list);
+char		**env_to_array(t_env *env_list);
+void		add_or_update_env(t_env **env_list, const char *arg);
 
 /* 信号处理 */
-void	setup_signals(void);
-void	reset_signals(void);
+void		setup_signals(void);
+void		reset_signals(void);
 
 /* 工具函数 */
-int		is_builtin(char *cmd);
-int		exec_builtin(t_cmd *cmd, t_env **env_list, t_shell *shell);
-char	*expand_variables(char *str, t_env *env_list, int exit_status);
-char	*ft_strjoin_char(char *s1, char c);
-char	*ft_strjoin_free(char *s1, const char *s2);
-void	print_error(const char *prefix, const char *arg, const char *message);
+int			is_builtin(char *cmd);
+int			exec_builtin(t_cmd *cmd, t_env **env_list, t_shell *shell);
+char		*expand_variables(char *str, t_env *env_list, int exit_status);
+char		*ft_strjoin_char(char *s1, char c);
+char		*ft_strjoin_free(char *s1, const char *s2);
+void		print_error(const char *prefix, const char *arg,
+				const char *message);
 
 /* Filename Utils */
-char	*process_filename_quotes(const char *raw_filename);
+char		*process_filename_quotes(const char *raw_filename);
 
 /* Main module functions */
-t_shell	*init_shell(char **envp);
-void	clean_current_command(t_shell *shell);
-void	free_shell(t_shell *shell);
-void	setup_readline(void);
-void	restore_terminal_state(void);
-void	handle_sigint_prompt(void);
-char	*read_input(void);
-int		execute_pipeline(t_shell *shell);
-int		process_input(t_shell *shell);
+t_shell		*init_shell(char **envp);
+void		clean_current_command(t_shell *shell);
+void		cleanup_before_exit(t_shell *shell);
+void		free_shell(t_shell *shell);
+void		setup_readline(void);
+void		restore_terminal_state(void);
+void		clear_readline_buffers(void);
+void		cleanup_readline_completely(void);
+void		handle_sigint_prompt(void);
+char		*read_input(void);
+int			execute_pipeline(t_shell *shell);
+int			process_input(t_shell *shell);
+
+/* Input processing functions */
+void		process_single_line(t_shell *shell, char *line);
+void		process_input_buffer(t_shell *shell, char *input_copy);
+void		process_non_interactive_input(t_shell *shell);
+void		handle_signal_status(t_shell *shell);
+void		process_interactive_input(t_shell *shell);
+void		handle_input_loop(t_shell *shell);
 
 /* Other utility functions */
-void	print_export_env(t_env *env_list);
-char	*get_key_from_str(const char *str);
+void		print_export_env(t_env *env_list);
+char		*get_key_from_str(const char *str);
 
 /* readline 函数声明 - 条件编译 */
 /* Note: readline functions are declared in readline/readline.h */
 
 /* Expansion module */
-int		expand_command(t_cmd *cmd, t_shell *shell);
-char	*expand_variables_in_str(char *str, t_shell *shell);
-char	*remove_quotes_from_str(char *str);
-char	*process_variable(char *str, int *i, t_env *env_list, int exit_status);
-char	*handle_variable_expansion(char *str, int *i, char *expanded,
-			t_expand_data *data);
-char	*process_expansion_loop(char *str, char *expanded,
-			t_expand_data *data, t_expand_state *state);
-char	**create_empty_result(void);
-char	**create_single_result(char *str);
-void	free_str_array(char **array);
-void	cleanup_args_on_error(char **new_args, int j);
-char	**perform_single_expansion(char *token, t_shell *shell);
-int		process_single_arg(char **new_args, int *j, char *arg, t_shell *shell);
+int			expand_command(t_cmd *cmd, t_shell *shell);
+char		*expand_variables_in_str(char *str, t_shell *shell);
+char		*remove_quotes_from_str(char *str);
+char		*process_variable(char *str, int *i, t_env *env_list,
+				int exit_status);
+char		*handle_variable_expansion(char *str, int *i, char *expanded,
+				t_expand_data *data);
+char		*process_expansion_loop(char *str, char *expanded,
+				t_expand_data *data, t_expand_state *state);
+char		**create_empty_result(void);
+char		**create_single_result(char *str);
+void		free_str_array(char **array);
+void		cleanup_args_on_error(char **new_args, int j);
+char		**perform_single_expansion(char *token, t_shell *shell);
+int			process_single_arg(char **new_args, int *j, char *arg,
+				t_shell *shell);
 
 /* Parser module */
-t_cmd	*parser(t_token *tokens);
-void	free_cmds(t_cmd *cmd_list);
+t_cmd		*parser(t_token *tokens);
+void		free_cmds(t_cmd *cmd_list);
 
 // expansion_helpers.c
-char	*handle_special_vars(char *str, int *i);
-char	*handle_normal_var(char *str, int *i, int start);
-char	*get_variable_value(char *key, t_env *env_list, int exit_status);
-int		skip_variable_name(char *str, int i);
+char		*handle_special_vars(char *str, int *i);
+char		*handle_normal_var(char *str, int *i, int start);
+char		*get_variable_value(char *key, t_env *env_list, int exit_status);
+int			skip_variable_name(char *str, int i);
 
 #endif
