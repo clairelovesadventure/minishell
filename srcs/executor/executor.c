@@ -6,20 +6,20 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:15:27 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:29:26 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-int		create_pipes(t_cmd *cmd_list);
-void	close_all_pipes(t_cmd *cmd_list);
-int		count_commands(t_cmd *cmd_list);
-int		setup_redirections(t_redirect *redirects);
-int		execute_external_cmd(t_cmd *cmd, t_env *env_list);
-int		is_parent_builtin(const char *cmd_name);
-void	setup_child_pipes(t_cmd *current, t_cmd *prev, t_cmd *cmd_list);
-int		wait_for_children(pid_t *pids, int num_cmds);
+int			create_pipes(t_cmd *cmd_list);
+void		close_all_pipes(t_cmd *cmd_list);
+int			count_commands(t_cmd *cmd_list);
+int			setup_redirections(t_redirect *redirects);
+int			execute_external_cmd(t_cmd *cmd, t_env *env_list);
+int			is_parent_builtin(const char *cmd_name);
+void		setup_child_pipes(t_cmd *current, t_cmd *prev, t_cmd *cmd_list);
+int			wait_for_children(pid_t *pids, int num_cmds);
 
 static void	execute_child_process(t_cmd *current, t_cmd *prev,
 		t_exec_data *data)
@@ -116,7 +116,8 @@ int	executor(t_cmd *cmd_list, t_env **env_list, t_shell *shell)
 	if (!cmd_list || !shell)
 		return (0);
 	num_cmds = count_commands(cmd_list);
-	if (is_single_parent_builtin(cmd_list, num_cmds)) {
+	if (is_single_parent_builtin(cmd_list, num_cmds))
+	{
 		exit_status = execute_builtin_command(cmd_list, env_list, shell);
 	}
 	else

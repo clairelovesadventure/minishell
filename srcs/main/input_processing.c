@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 17:15:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:02:29 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:34:22 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ void	process_non_interactive_input(t_shell *shell)
 			return ;
 		process_input_buffer(shell, input_copy);
 		free(input_copy);
-		// Ensure any remaining command data is cleaned up
 		clean_current_command(shell);
 	}
 }
@@ -42,7 +41,6 @@ void	process_interactive_input(t_shell *shell)
 		handle_signal_status(shell);
 		if (!current_input)
 		{
-			// Print "exit" when EOF (Ctrl+D) is received, matching bash behavior
 			if (isatty(STDIN_FILENO))
 				ft_putendl_fd("exit", STDOUT_FILENO);
 			break ;

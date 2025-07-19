@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:30 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:00:58 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:32:46 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,26 +60,15 @@ void	restore_terminal_state(t_shell *shell)
 
 void	clear_readline_buffers(void)
 {
-	// Clear readline's internal line buffer
 	rl_clear_history();
-
-	// Clear the current line buffer
 	rl_replace_line("", 0);
 	rl_redisplay();
 }
 
 void	cleanup_readline_completely(void)
 {
-	// Clear readline's internal line buffer
 	rl_clear_history();
-
-	// Clear the current line buffer
 	rl_replace_line("", 0);
 	rl_redisplay();
-
-	// Free readline's internal variables and state
 	rl_clear_history();
-
-	// Note: rl_initialize() allocates memory, so we don't call it during cleanup
-	// The readline library will clean up its internal state when the program exits
 }
