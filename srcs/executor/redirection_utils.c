@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/17 19:01:39 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:05:30 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,11 +57,11 @@ int	handle_append_redirect(char *filename)
 	return (1);
 }
 
-int	handle_heredoc_redirect(char *delimiter)
+int	handle_heredoc_redirect(char *delimiter, t_shell *shell)
 {
 	int	fd;
 
-	fd = handle_heredoc(delimiter);
+	fd = handle_heredoc(delimiter, shell);
 	if (fd == -1)
 		return (0);
 	if (dup2(fd, STDIN_FILENO) == -1)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
+/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 22:00:10 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:15:27 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ int		wait_for_children(pid_t *pids, int num_cmds);
 static void	execute_child_process(t_cmd *current, t_cmd *prev,
 		t_exec_data *data)
 {
+	reset_signals();
 	setup_child_pipes(current, prev, data->cmd_list);
 	if (!setup_redirections(current->redirects))
 		exit(1);

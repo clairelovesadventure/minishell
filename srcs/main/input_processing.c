@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input_processing.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
+/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 17:15:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 21:56:19 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:02:29 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	process_interactive_input(t_shell *shell)
 
 	while (1)
 	{
-		current_input = read_input();
+		current_input = read_input(shell);
 		handle_signal_status(shell);
 		if (!current_input)
 		{

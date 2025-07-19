@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
+/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 21:51:51 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:00:02 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,9 @@ t_shell	*init_shell(char **envp)
 	shell->tokens = NULL;
 	shell->input = NULL;
 	shell->exit_status = 0;
+	shell->readline_pid = 0;
+	shell->heredoc_interrupted = 0;
+	shell->term_saved = 0;
 	return (shell);
 }
 

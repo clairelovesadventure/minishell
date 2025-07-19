@@ -12,14 +12,24 @@
 
 #include "../../includes/minishell.h"
 
+static t_shell	*g_current_shell = NULL;
+
+void	set_heredoc_shell(t_shell *shell)
+{
+	g_current_shell = shell;
+}
+
 void	heredoc_sigint_handler(int sig)
 {
 	(void)sig;
-	g_heredoc_interrupted = 1;
-	if (g_readline_pid > 0)
+	if (g_current_shell)
 	{
-		kill(g_readline_pid, SIGINT);
-		g_readline_pid = 0;
+		g_current_shell->heredoc_interrupted = 1;
+		if (g_current_shell->readline_pid > 0)
+		{
+			kill(g_current_shell->readline_pid, SIGINT);
+			g_current_shell->readline_pid = 0;
+		}
 	}
 	write(STDOUT_FILENO, "\n", 1);
 }
@@ -40,6 +50,6 @@ int	setup_heredoc_signals(void)
 void	restore_heredoc_signals(void)
 {
 	setup_signals();
-	if (g_heredoc_interrupted)
-		setup_readline();
+	if (g_current_shell && g_current_shell->heredoc_interrupted)
+		setup_readline(g_current_shell);
 }

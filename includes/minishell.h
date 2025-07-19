@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
+/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 19:24:50 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 22:07:21 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:06:19 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,8 @@
 # include <dirent.h>
 # include <termios.h>
 
-/* 信号处理的全局变量 */
+/* Signal handling global variable */
 extern int				g_signal_status;
-extern volatile pid_t	g_readline_pid;
-extern volatile int		g_heredoc_interrupted;
 
 /* 标记类型枚举 */
 typedef enum e_token_type
@@ -84,11 +82,15 @@ typedef struct s_env
 /* 主要shell结构 */
 typedef struct s_shell
 {
-	t_env	*env_list;
-	t_cmd	*cmd_list;
-	t_token	*tokens;
-	char	*input;
-	int		exit_status;
+	t_env			*env_list;
+	t_cmd			*cmd_list;
+	t_token			*tokens;
+	char			*input;
+	int				exit_status;
+	volatile pid_t	readline_pid;
+	volatile int	heredoc_interrupted;
+	struct termios	original_term;
+	int				term_saved;
 }	t_shell;
 
 /* 执行器数据结构 */
@@ -138,7 +140,7 @@ t_cmd		*handle_pipe(t_token **token, t_cmd *cmd);
 int			executor(t_cmd *cmd_list, t_env **env_list, t_shell *shell);
 char		*find_executable(char *cmd, t_env *env_list);
 void		free_array(char **array);
-int			handle_heredoc(char *delimiter);
+int			handle_heredoc(char *delimiter, t_shell *shell);
 int			setup_redirections(t_redirect *redirects);
 int			is_parent_builtin(const char *cmd_name);
 int			is_single_parent_builtin(t_cmd *cmd_list, int num_cmds);
@@ -147,7 +149,7 @@ int			execute_builtin_command(t_cmd *cmd_list, t_env **env_list,
 int			handle_input_redirect(char *filename);
 int			handle_output_redirect(char *filename);
 int			handle_append_redirect(char *filename);
-int			handle_heredoc_redirect(char *delimiter);
+int			handle_heredoc_redirect(char *delimiter, t_shell *shell);
 
 /* Heredoc preprocessing */
 int			preprocess_heredoc(t_redirect *redirect);
@@ -156,6 +158,7 @@ int			preprocess_heredocs_in_cmd(t_cmd *cmd);
 int			preprocess_all_heredocs(t_cmd *cmd_list);
 
 /* Heredoc signals */
+void		set_heredoc_shell(t_shell *shell);
 void		heredoc_sigint_handler(int sig);
 int			setup_heredoc_signals(void);
 void		restore_heredoc_signals(void);
@@ -204,12 +207,12 @@ t_shell		*init_shell(char **envp);
 void		clean_current_command(t_shell *shell);
 void		cleanup_before_exit(t_shell *shell);
 void		free_shell(t_shell *shell);
-void		setup_readline(void);
-void		restore_terminal_state(void);
+void		setup_readline(t_shell *shell);
+void		restore_terminal_state(t_shell *shell);
 void		clear_readline_buffers(void);
 void		cleanup_readline_completely(void);
 void		handle_sigint_prompt(void);
-char		*read_input(void);
+char		*read_input(t_shell *shell);
 int			execute_pipeline(t_shell *shell);
 int			process_input(t_shell *shell);
 

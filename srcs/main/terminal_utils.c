@@ -3,42 +3,39 @@
 /*                                                        :::      ::::::::   */
 /*   terminal_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
+/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:30 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 21:13:58 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:00:58 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 #include <termios.h>
 
-static struct termios	g_original_term;
-static int				g_term_saved = 0;
-
-static int	save_terminal_state(void)
+static int	save_terminal_state(t_shell *shell)
 {
 	if (isatty(STDIN_FILENO))
 	{
-		if (tcgetattr(STDIN_FILENO, &g_original_term) == -1)
+		if (tcgetattr(STDIN_FILENO, &shell->original_term) == -1)
 			return (-1);
-		g_term_saved = 1;
+		shell->term_saved = 1;
 	}
 	return (0);
 }
 
-static int	setup_terminal_for_readline(void)
+static int	setup_terminal_for_readline(t_shell *shell)
 {
 	struct termios	term;
 
 	if (!isatty(STDIN_FILENO))
 		return (0);
-	if (!g_term_saved)
+	if (!shell->term_saved)
 	{
-		if (save_terminal_state() == -1)
+		if (save_terminal_state(shell) == -1)
 			return (-1);
 	}
-	term = g_original_term;
+	term = shell->original_term;
 	term.c_lflag &= ~ECHOCTL;
 	term.c_cc[VQUIT] = 0;
 	if (tcsetattr(STDIN_FILENO, TCSANOW, &term) == -1)
@@ -46,18 +43,18 @@ static int	setup_terminal_for_readline(void)
 	return (0);
 }
 
-void	setup_readline(void)
+void	setup_readline(t_shell *shell)
 {
-	if (setup_terminal_for_readline() == -1)
+	if (setup_terminal_for_readline(shell) == -1)
 		return ;
 	rl_catch_signals = 0;
 }
 
-void	restore_terminal_state(void)
+void	restore_terminal_state(t_shell *shell)
 {
-	if (g_term_saved && isatty(STDIN_FILENO))
+	if (shell->term_saved && isatty(STDIN_FILENO))
 	{
-		tcsetattr(STDIN_FILENO, TCSANOW, &g_original_term);
+		tcsetattr(STDIN_FILENO, TCSANOW, &shell->original_term);
 	}
 }
 
