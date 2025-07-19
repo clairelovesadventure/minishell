@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_handler.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/05/23 22:59:32 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:39:07 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static char	*prepare_filename(t_redirect *redirect)
 	return (processed_filename);
 }
 
-static int	execute_redirect(t_redirect *redirect, char *filename)
+static int	execute_redirect(t_redirect *redirect, char *filename, t_shell *shell)
 {
 	if (redirect->type == T_REDIR_IN)
 		return (handle_input_redirect(filename));
@@ -43,11 +43,11 @@ static int	execute_redirect(t_redirect *redirect, char *filename)
 	else if (redirect->type == T_REDIR_APPEND)
 		return (handle_append_redirect(filename));
 	else if (redirect->type == T_HEREDOC)
-		return (handle_heredoc_redirect(filename));
+		return (handle_heredoc_redirect(filename, shell));
 	return (0);
 }
 
-static int	process_single_redirect(t_redirect *redirect)
+static int	process_single_redirect(t_redirect *redirect, t_shell *shell)
 {
 	char	*processed_filename;
 	int		result;
@@ -55,16 +55,16 @@ static int	process_single_redirect(t_redirect *redirect)
 	processed_filename = prepare_filename(redirect);
 	if (!processed_filename)
 		return (0);
-	result = execute_redirect(redirect, processed_filename);
+	result = execute_redirect(redirect, processed_filename, shell);
 	free(processed_filename);
 	return (result);
 }
 
-int	setup_redirections(t_redirect *redirects)
+int	setup_redirections(t_redirect *redirects, t_shell *shell)
 {
 	while (redirects)
 	{
-		if (!process_single_redirect(redirects))
+		if (!process_single_redirect(redirects, shell))
 			return (0);
 		redirects = redirects->next;
 	}

@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 19:24:50 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:06:19 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:38:40 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ int			executor(t_cmd *cmd_list, t_env **env_list, t_shell *shell);
 char		*find_executable(char *cmd, t_env *env_list);
 void		free_array(char **array);
 int			handle_heredoc(char *delimiter, t_shell *shell);
-int			setup_redirections(t_redirect *redirects);
+int			setup_redirections(t_redirect *redirects, t_shell *shell);
 int			is_parent_builtin(const char *cmd_name);
 int			is_single_parent_builtin(t_cmd *cmd_list, int num_cmds);
 int			execute_builtin_command(t_cmd *cmd_list, t_env **env_list,
@@ -152,10 +152,10 @@ int			handle_append_redirect(char *filename);
 int			handle_heredoc_redirect(char *delimiter, t_shell *shell);
 
 /* Heredoc preprocessing */
-int			preprocess_heredoc(t_redirect *redirect);
+int			preprocess_heredoc(t_redirect *redirect, t_shell *shell);
 void		cleanup_temp_files(t_cmd *cmd_list);
-int			preprocess_heredocs_in_cmd(t_cmd *cmd);
-int			preprocess_all_heredocs(t_cmd *cmd_list);
+int			preprocess_heredocs_in_cmd(t_cmd *cmd, t_shell *shell);
+int			preprocess_all_heredocs(t_cmd *cmd_list, t_shell *shell);
 
 /* Heredoc signals */
 void		set_heredoc_shell(t_shell *shell);

@@ -52,13 +52,13 @@ static int	create_temp_file(int fd, char **temp_file, int *temp_fd)
 	return (0);
 }
 
-int	preprocess_heredoc(t_redirect *redirect)
+int	preprocess_heredoc(t_redirect *redirect, t_shell *shell)
 {
 	int		fd;
 	char	*temp_file;
 	int		temp_fd;
 
-	fd = handle_heredoc(redirect->file);
+	fd = handle_heredoc(redirect->file, shell);
 	if (fd == -1)
 		return (-1);
 	if (create_temp_file(fd, &temp_file, &temp_fd) == -1)
@@ -95,7 +95,7 @@ void	cleanup_temp_files(t_cmd *cmd_list)
 	}
 }
 
-int	preprocess_heredocs_in_cmd(t_cmd *cmd)
+int	preprocess_heredocs_in_cmd(t_cmd *cmd, t_shell *shell)
 {
 	t_redirect	*redirect;
 
@@ -104,7 +104,7 @@ int	preprocess_heredocs_in_cmd(t_cmd *cmd)
 	{
 		if (redirect->type == T_HEREDOC)
 		{
-			if (preprocess_heredoc(redirect) == -1)
+			if (preprocess_heredoc(redirect, shell) == -1)
 				return (-1);
 		}
 		redirect = redirect->next;
@@ -112,14 +112,14 @@ int	preprocess_heredocs_in_cmd(t_cmd *cmd)
 	return (0);
 }
 
-int	preprocess_all_heredocs(t_cmd *cmd_list)
+int	preprocess_all_heredocs(t_cmd *cmd_list, t_shell *shell)
 {
 	t_cmd	*current;
 
 	current = cmd_list;
 	while (current)
 	{
-		if (preprocess_heredocs_in_cmd(current) == -1)
+		if (preprocess_heredocs_in_cmd(current, shell) == -1)
 			return (-1);
 		current = current->next;
 	}

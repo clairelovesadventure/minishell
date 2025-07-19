@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
+/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/18 22:10:09 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:39:33 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static int	execute_single_builtin(t_cmd *cmd, t_env **env_list, t_shell *shell)
 	stdout_backup = dup(STDOUT_FILENO);
 	if (stdin_backup == -1 || stdout_backup == -1)
 		return (1);
-	if (!setup_redirections(cmd->redirects))
+	if (!setup_redirections(cmd->redirects, shell))
 		exit_status = 1;
 	else if (!cmd->args || !cmd->args[0])
 		exit_status = 0;

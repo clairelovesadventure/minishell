@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:29:26 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:39:56 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int			create_pipes(t_cmd *cmd_list);
 void		close_all_pipes(t_cmd *cmd_list);
 int			count_commands(t_cmd *cmd_list);
-int			setup_redirections(t_redirect *redirects);
+int			setup_redirections(t_redirect *redirects, t_shell *shell);
 int			execute_external_cmd(t_cmd *cmd, t_env *env_list);
 int			is_parent_builtin(const char *cmd_name);
 void		setup_child_pipes(t_cmd *current, t_cmd *prev, t_cmd *cmd_list);
@@ -26,7 +26,7 @@ static void	execute_child_process(t_cmd *current, t_cmd *prev,
 {
 	reset_signals();
 	setup_child_pipes(current, prev, data->cmd_list);
-	if (!setup_redirections(current->redirects))
+	if (!setup_redirections(current->redirects, data->shell))
 		exit(1);
 	if (current->args && current->args[0])
 	{
@@ -76,7 +76,7 @@ static int	cleanup_and_return(pid_t *pids, t_cmd *cmd_list, int return_value)
 static int	initialize_pipeline(t_cmd *cmd_list, t_env **env_list,
 		t_shell *shell, t_exec_data *data)
 {
-	if (preprocess_all_heredocs(cmd_list) == -1)
+	if (preprocess_all_heredocs(cmd_list, shell) == -1)
 		return (1);
 	data->cmd_list = cmd_list;
 	data->env_list = env_list;
