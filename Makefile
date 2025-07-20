@@ -6,14 +6,14 @@
 #    By: marrey <marrey@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/01 00:00:00 by user              #+#    #+#              #
-#    Updated: 2025/07/20 03:27:21 by marrey           ###   ########.fr        #
+#    Updated: 2025/07/20 08:03:51 by shutan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g
+CFLAGS = -Wall -Wextra -Werror
 RM = rm -f
 
 # 包含libft库
