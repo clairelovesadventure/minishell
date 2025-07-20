@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shutan <shutan@student.42.fr>        +#+  +:+       +#+        */
+/*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/13 16:42:00 by shutan         #+#    #+#             */
-/*   Updated: 2025/02/13 16:42:00 by shutan        ###   ########.fr       */
+/*   Created: 2024/04/26 15:32:09 by shutan         #+#    #+#             */
+/*   Updated: 2024/04/29 10:27:13 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 # define FT_PRINTF_H
 
 # include <stdarg.h>
-# include "libft.h"
 
 int	ft_printf(const char *format, ...);
 int	print_ptr(unsigned long int pa);
@@ -22,4 +21,4 @@ int	print_str(char *str);
 int	print_u(int num);
 int	print_hex(unsigned int num, char format);
 
-#endif 
+#endif
