@@ -6,12 +6,16 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:30 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 02:44:20 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 03:10:51 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 #include <termios.h>
+
+/* Function declarations from readline_utils.c */
+void	clear_readline_buffers(void);
+void	cleanup_readline_completely(void);
 
 static int	save_terminal_state(t_shell *shell)
 {
@@ -55,19 +59,4 @@ void	restore_terminal_state(t_shell *shell)
 	{
 		tcsetattr(STDIN_FILENO, TCSANOW, &shell->original_term);
 	}
-}
-
-void	clear_readline_buffers(void)
-{
-	rl_clear_history();
-	rl_replace_line("", 0);
-	rl_redisplay();
-}
-
-void	cleanup_readline_completely(void)
-{
-	rl_clear_history();
-	rl_replace_line("", 0);
-	rl_redisplay();
-	rl_clear_history();
 }

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: shutan <shutan@student.42.fr>              +#+  +:+       +#+         #
+#    By: marrey <marrey@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/01 00:00:00 by user              #+#    #+#              #
-#    Updated: 2025/07/18 21:43:55 by shutan           ###   ########.fr        #
+#    Updated: 2025/07/20 03:15:06 by marrey           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,6 +33,7 @@ SRCS = $(SRCS_PATH)/main.c \
        $(SRCS_PATH)/main/input_processing.c \
        $(SRCS_PATH)/main/input_utils.c \
        $(SRCS_PATH)/main/terminal_utils.c \
+       $(SRCS_PATH)/main/readline_utils.c \
        $(SRCS_PATH)/main/command_processor.c \
        $(SRCS_PATH)/lexer/lexer.c \
        $(SRCS_PATH)/lexer/lexer_utils.c \
@@ -43,6 +44,7 @@ SRCS = $(SRCS_PATH)/main.c \
        $(SRCS_PATH)/parser/parser_redirect.c \
        $(SRCS_PATH)/parser/parser_args.c \
        $(SRCS_PATH)/expansion/expansion.c \
+       $(SRCS_PATH)/expansion/expansion_args.c \
        $(SRCS_PATH)/expansion/variable_expansion.c \
        $(SRCS_PATH)/expansion/quote_removal.c \
        $(SRCS_PATH)/expansion/expansion_utils.c \
@@ -54,6 +56,7 @@ SRCS = $(SRCS_PATH)/main.c \
        $(SRCS_PATH)/executor/heredoc.c \
        $(SRCS_PATH)/executor/heredoc_signals.c \
        $(SRCS_PATH)/executor/heredoc_utils.c \
+       $(SRCS_PATH)/executor/heredoc_helpers.c \
        $(SRCS_PATH)/executor/heredoc_preprocess.c \
        $(SRCS_PATH)/executor/filename_utils.c \
        $(SRCS_PATH)/executor/builtin_handler.c \

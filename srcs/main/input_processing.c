@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 17:15:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:34:22 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 03:12:41 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,33 @@ void	process_non_interactive_input(t_shell *shell)
 	}
 }
 
+static void	process_valid_input(t_shell *shell, char *current_input)
+{
+	shell->input = ft_strdup(current_input);
+	free(current_input);
+	if (shell->input)
+	{
+		add_history(shell->input);
+		process_input(shell);
+		clean_current_command(shell);
+	}
+}
+
+static int	handle_input_result(t_shell *shell, char *current_input)
+{
+	if (!current_input)
+	{
+		if (isatty(STDIN_FILENO))
+			ft_putendl_fd("exit", STDOUT_FILENO);
+		return (0);
+	}
+	if (current_input[0] != '\0')
+		process_valid_input(shell, current_input);
+	else
+		free(current_input);
+	return (1);
+}
+
 void	process_interactive_input(t_shell *shell)
 {
 	char	*current_input;
@@ -39,25 +66,8 @@ void	process_interactive_input(t_shell *shell)
 	{
 		current_input = read_input(shell);
 		handle_signal_status(shell);
-		if (!current_input)
-		{
-			if (isatty(STDIN_FILENO))
-				ft_putendl_fd("exit", STDOUT_FILENO);
+		if (!handle_input_result(shell, current_input))
 			break ;
-		}
-		if (current_input[0] != '\0')
-		{
-			shell->input = ft_strdup(current_input);
-			free(current_input);
-			if (shell->input)
-			{
-				add_history(shell->input);
-				process_input(shell);
-				clean_current_command(shell);
-			}
-		}
-		else
-			free(current_input);
 	}
 }
 
