@@ -6,7 +6,7 @@
 #    By: marrey <marrey@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/01 00:00:00 by user              #+#    #+#              #
-#    Updated: 2025/07/20 03:15:06 by marrey           ###   ########.fr        #
+#    Updated: 2025/07/20 03:27:21 by marrey           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,11 +52,13 @@ SRCS = $(SRCS_PATH)/main.c \
        $(SRCS_PATH)/expansion/expansion_vars.c \
        $(SRCS_PATH)/expansion/expansion_memory.c \
        $(SRCS_PATH)/executor/executor.c \
+       $(SRCS_PATH)/executor/executor_pipeline.c \
        $(SRCS_PATH)/executor/executor_utils.c \
        $(SRCS_PATH)/executor/heredoc.c \
        $(SRCS_PATH)/executor/heredoc_signals.c \
        $(SRCS_PATH)/executor/heredoc_utils.c \
        $(SRCS_PATH)/executor/heredoc_helpers.c \
+       $(SRCS_PATH)/executor/heredoc_cleanup.c \
        $(SRCS_PATH)/executor/heredoc_preprocess.c \
        $(SRCS_PATH)/executor/filename_utils.c \
        $(SRCS_PATH)/executor/builtin_handler.c \

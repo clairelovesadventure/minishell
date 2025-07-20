@@ -12,6 +12,11 @@
 
 #include "../../includes/minishell.h"
 
+/* External function declarations from heredoc_cleanup.c */
+void	cleanup_temp_files(t_cmd *cmd_list);
+int		preprocess_heredocs_in_cmd(t_cmd *cmd, t_shell *shell);
+int		preprocess_all_heredocs(t_cmd *cmd_list, t_shell *shell);
+
 static int	cleanup_on_error(int fd, int temp_fd, char *temp_file)
 {
 	close(fd);
@@ -70,58 +75,5 @@ int	preprocess_heredoc(t_redirect *redirect, t_shell *shell)
 	free(redirect->file);
 	redirect->file = temp_file;
 	redirect->type = T_REDIR_IN;
-	return (0);
-}
-
-void	cleanup_temp_files(t_cmd *cmd_list)
-{
-	t_cmd		*current;
-	t_redirect	*redirect;
-
-	current = cmd_list;
-	while (current)
-	{
-		redirect = current->redirects;
-		while (redirect)
-		{
-			if (redirect->type == T_REDIR_IN && redirect->file
-				&& ft_strncmp(redirect->file, "/tmp/heredoc_", 13) == 0)
-			{
-				unlink(redirect->file);
-			}
-			redirect = redirect->next;
-		}
-		current = current->next;
-	}
-}
-
-int	preprocess_heredocs_in_cmd(t_cmd *cmd, t_shell *shell)
-{
-	t_redirect	*redirect;
-
-	redirect = cmd->redirects;
-	while (redirect)
-	{
-		if (redirect->type == T_HEREDOC)
-		{
-			if (preprocess_heredoc(redirect, shell) == -1)
-				return (-1);
-		}
-		redirect = redirect->next;
-	}
-	return (0);
-}
-
-int	preprocess_all_heredocs(t_cmd *cmd_list, t_shell *shell)
-{
-	t_cmd	*current;
-
-	current = cmd_list;
-	while (current)
-	{
-		if (preprocess_heredocs_in_cmd(current, shell) == -1)
-			return (-1);
-		current = current->next;
-	}
 	return (0);
 }

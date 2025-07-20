@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 03:15:00 by marrey            #+#    #+#             */
-/*   Updated: 2025/07/20 03:15:34 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 03:23:26 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,4 +83,4 @@ int	setup_heredoc_pipe_and_signals(int pipe_fd[2])
 	if (setup_heredoc_signals() == -1)
 		return (-1);
 	return (0);
-} 
+}
