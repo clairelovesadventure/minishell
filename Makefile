@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: marrey <marrey@student.42.fr>              +#+  +:+       +#+         #
+#    By: shutan <shutan@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/01 00:00:00 by user              #+#    #+#              #
-#    Updated: 2025/07/20 08:03:51 by shutan           ###   ########.fr        #
+#    Updated: 2025/07/20 08:53:03 by shutan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -57,6 +57,7 @@ SRCS = $(SRCS_PATH)/main.c \
        $(SRCS_PATH)/executor/heredoc.c \
        $(SRCS_PATH)/executor/heredoc_signals.c \
        $(SRCS_PATH)/executor/heredoc_utils.c \
+       $(SRCS_PATH)/executor/heredoc_expansion.c \
        $(SRCS_PATH)/executor/heredoc_helpers.c \
        $(SRCS_PATH)/executor/heredoc_cleanup.c \
        $(SRCS_PATH)/executor/heredoc_preprocess.c \

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
+/*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 21:45:30 by marrey            #+#    #+#             */
-/*   Updated: 2025/07/20 03:05:22 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 08:55:23 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,12 @@ static int	expand_redirects(t_cmd *cmd, t_shell *shell)
 	current = cmd->redirects;
 	while (current)
 	{
-		result = process_redirect_expansion(current, shell);
-		if (result == -1)
-			return (-1);
+		if (current->type != T_HEREDOC)
+		{
+			result = process_redirect_expansion(current, shell);
+			if (result == -1)
+				return (-1);
+		}
 		current = current->next;
 	}
 	return (0);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
+/*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 19:24:50 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 02:58:32 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 08:50:05 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,8 @@ void		restore_heredoc_signals(void);
 /* Heredoc utilities */
 void		cleanup_pipe(int pipe_fd[2]);
 char		*process_heredoc_buffer(char *buffer, ssize_t bytes_read);
-int			process_heredoc_line(int pipe_fd[2], char *line, char *delimiter);
+int			process_heredoc_line(int pipe_fd[2], char *line,
+				char *delimiter, t_shell *shell);
 int			handle_heredoc_interruption(int pipe_fd[2]);
 
 /* 内置命令 */

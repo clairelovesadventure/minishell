@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
+/*   By: shutan <shutan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 14:30:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 03:15:46 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 08:41:25 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static void	process_heredoc_loop(int pipe_fd[2], char *delimiter,
 		line = read_heredoc_line(shell);
 		if (!line)
 			break ;
-		if (process_heredoc_line(pipe_fd, line, delimiter))
+		if (process_heredoc_line(pipe_fd, line, delimiter, shell))
 			break ;
 	}
 }
