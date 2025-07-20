@@ -6,11 +6,12 @@
 /*   By: shutan <shutan@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/01 15:38:10 by shutan            #+#    #+#             */
-/*   Updated: 2024/05/14 18:57:08 by shutan           ###   ########.fr       */
+/*   Updated: 2025/07/20 17:03:33 by shutan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
+#include <unistd.h>
 
 int	print_u(int num)
 {
