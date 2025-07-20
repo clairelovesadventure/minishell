@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 02:58:48 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 03:39:26 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,7 @@ static int	handle_child_status(int status)
 		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))
 	{
-		if (WTERMSIG(status) == SIGINT)
-			write(STDOUT_FILENO, "\n", 1);
-		else if (WTERMSIG(status) == SIGQUIT)
+		if (WTERMSIG(status) == SIGQUIT)
 			write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 		return (128 + WTERMSIG(status));
 	}
