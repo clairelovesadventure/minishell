@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:39:33 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:47:51 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ static void	restore_file_descriptors(int stdin_backup, int stdout_backup)
 
 static void	handle_exit_command(int exit_status, t_shell *shell)
 {
-		clean_current_command(shell);
-		cleanup_before_exit(shell);
-		exit(exit_status);
+	clean_current_command(shell);
+	cleanup_before_exit(shell);
+	exit(exit_status);
 }
 
 static int	execute_single_builtin(t_cmd *cmd, t_env **env_list, t_shell *shell)

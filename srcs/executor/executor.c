@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:39:56 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 02:49:22 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int			setup_redirections(t_redirect *redirects, t_shell *shell);
 int			execute_external_cmd(t_cmd *cmd, t_env *env_list);
 int			is_parent_builtin(const char *cmd_name);
 void		setup_child_pipes(t_cmd *current, t_cmd *prev, t_cmd *cmd_list);
-int			wait_for_children(pid_t *pids, int num_cmds);
+int			wait_for_children(pid_t *pids, int num_cmds, t_shell *shell);
 
 static void	execute_child_process(t_cmd *current, t_cmd *prev,
 		t_exec_data *data)
@@ -101,7 +101,7 @@ static int	execute_cmd_pipeline(t_cmd *cmd_list, t_env **env_list,
 	if (fork_and_execute(&data, pids) != 0)
 		return (cleanup_and_return(pids, cmd_list, 1));
 	close_all_pipes(cmd_list);
-	result = wait_for_children(pids, num_cmds);
+	result = wait_for_children(pids, num_cmds, shell);
 	cleanup_temp_files(cmd_list);
 	free(pids);
 	return (result);

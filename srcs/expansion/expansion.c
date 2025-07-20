@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 21:45:30 by marrey            #+#    #+#             */
-/*   Updated: 2025/07/20 01:33:59 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:49:51 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,9 @@ static int	expand_redirects(t_cmd *cmd, t_shell *shell)
 		if (!expanded)
 		{
 			current = current->next;
-			continue;
+			continue ;
 		}
-		if (expanded[0] == NULL || expanded[1] != NULL
-			|| *expanded[0] == '\0')
+		if (expanded[0] == NULL || expanded[1] != NULL || *expanded[0] == '\0')
 		{
 			ft_putstr_fd("minishell: ", STDERR_FILENO);
 			ft_putstr_fd(current->file, STDERR_FILENO);

@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/23 00:00:00 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:39:07 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:49:16 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@ static char	*prepare_filename(t_redirect *redirect)
 	return (processed_filename);
 }
 
-static int	execute_redirect(t_redirect *redirect, char *filename, t_shell *shell)
+static int	execute_redirect(t_redirect *redirect, char *filename,
+		t_shell *shell)
 {
 	if (redirect->type == T_REDIR_IN)
 		return (handle_input_redirect(filename));

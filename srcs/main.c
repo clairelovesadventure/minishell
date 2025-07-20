@@ -6,13 +6,13 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:21 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:01:32 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 01:49:33 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int	g_signal_status = 0;
+int		g_signal_status = 0;
 
 void	cleanup_before_exit(t_shell *shell)
 {

@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:30 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 01:32:46 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 02:44:20 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ static int	setup_terminal_for_readline(t_shell *shell)
 	}
 	term = shell->original_term;
 	term.c_lflag &= ~ECHOCTL;
-	term.c_cc[VQUIT] = 0;
 	if (tcsetattr(STDIN_FILENO, TCSANOW, &term) == -1)
 		return (-1);
 	return (0);
