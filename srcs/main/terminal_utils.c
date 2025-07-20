@@ -6,7 +6,7 @@
 /*   By: marrey <marrey@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:30 by shutan            #+#    #+#             */
-/*   Updated: 2025/07/20 03:10:51 by marrey           ###   ########.fr       */
+/*   Updated: 2025/07/20 04:35:59 by marrey           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ void	setup_readline(t_shell *shell)
 	if (setup_terminal_for_readline(shell) == -1)
 		return ;
 	rl_catch_signals = 0;
+	rl_completion_append_character = ' ';
+	rl_completion_query_items = 100;
 }
 
 void	restore_terminal_state(t_shell *shell)
